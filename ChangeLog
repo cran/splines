@@ -1,3 +1,14 @@
+1999-07-19  Douglas Bates  <bates@stat.wisc.edu>
+
+	* src/Makefile (LIBNAME): Removed this Makefile - no longer needed
+
+	* R/splines.R: Bug fix in ns on nIknots due to Bill Venables.
+
+1999-07-16  Douglas Bates  <bates@stat.wisc.edu>
+
+	* R/splines.R: Incorporated fixes from Martin Maechler for missing
+	drop = FALSE that caused bs(..., degree = 1) to fail.  Cosmetic changes.
+
 1998-06-30  Douglas Bates  <bates@stat.wisc.edu>
 
 	* Changed the source location from src-c to src.

@@ -1,5 +1,7 @@
+### $Id: splines.R,v 1.3 1999/07/19 13:42:39 bates Exp $
+
 bs <-
-  function(x, df = NULL, knots = NULL, degree = 3, intercept = F,
+  function(x, df = NULL, knots = NULL, degree = 3, intercept = FALSE,
            Boundary.knots = range(x))
 {
   nx <- names(x)
@@ -11,47 +13,46 @@ bs <-
     Boundary.knots <- sort(Boundary.knots)
     outside <- (ol <- x < Boundary.knots[1]) | (or <- x > Boundary.knots[2])
   }
-  else outside <- rep(F, length = length(x))
+  else outside <- FALSE #rep(FALSE, length = length(x))
+
+  ord <- 1 + (degree <- as.integer(degree))
+  if(ord <= 1) stop("degree must be integer >= 1")
   if(!missing(df) && missing(knots)) {
-    nIknots <- df - (degree + 1) + (1 - intercept)
+    nIknots <- df - ord + (1 - intercept)
     if(nIknots < 0) {
       nIknots <- 0
-      warning(paste("df was too small; have used ",
-                    (degree + 1) - (1 - intercept)))
+      warning(paste("df was too small; have used ", ord - (1 - intercept)))
     }
+    knots <-
     if(nIknots > 0) {
       knots <- seq(from = 0, to = 1, length = nIknots + 2)[-c(1, nIknots + 2)]
-      knots <- quantile(x[!outside], knots)
+        quantile(x[!outside], knots)
     }
-    else knots <- NULL
   }
-  Aknots <- sort(c(rep(Boundary.knots, degree + 1), knots))
+  Aknots <- sort(c(rep(Boundary.knots, ord), knots))
   if(any(outside)) {
     warning("Some x values beyond boundary knots may cause ill-conditioned bases")
-    derivs <- seq(from = 0, to = degree)	
-                                        # tricky way to do factorial
-    scalef <- c(1, exp(cumsum(log(seq(degree)))))
+    derivs <- 0:degree
+    scalef <- gamma(1:ord)# factorials
     basis <- array(0, c(length(x), length(Aknots) - degree - 1))
     if(any(ol)) {
       k.pivot <- Boundary.knots[1]
       xl <- cbind(1, outer(x[ol] - k.pivot, 1:degree, "^"))
-      tt <-
-        spline.des(Aknots, rep(k.pivot, degree + 1), degree + 1, derivs)$design
+      tt <- spline.des(Aknots, rep(k.pivot, ord), ord, derivs)$design
       basis[ol,  ] <- xl %*% (tt/scalef)
     }
     if(any(or)) {
       k.pivot <- Boundary.knots[2]
       xr <- cbind(1, outer(x[or] - k.pivot, 1:degree, "^"))
-      tt <-
-        spline.des(Aknots, rep(k.pivot, degree + 1), degree + 1, derivs)$design
+      tt <- spline.des(Aknots, rep(k.pivot, ord), ord, derivs)$design
       basis[or,  ] <- xr %*% (tt/scalef)
     }
     if(any(inside <- !outside))
-      basis[inside,  ] <- spline.des(Aknots, x[inside], degree + 1)$design
+      basis[inside,  ] <- spline.des(Aknots, x[inside], ord)$design
   }
-  else basis <- spline.des(Aknots, x, degree + 1)$design
+  else basis <- spline.des(Aknots, x, ord)$design
   if(!intercept)
-    basis <- basis[, -1]
+    basis <- basis[, -1 , drop = FALSE]
   n.col <- ncol(basis)
   if(nas) {
     nmat <- matrix(NA, length(nax), n.col)
@@ -66,7 +67,7 @@ bs <-
 }
 
 ns <-
-  function(x, df = NULL, knots = NULL, intercept = F,
+  function(x, df = NULL, knots = NULL, intercept = FALSE,
            Boundary.knots = range(x))
 {
   nx <- names(x)
@@ -78,7 +79,7 @@ ns <-
     Boundary.knots <- sort(Boundary.knots)
     outside <- (ol <- x < Boundary.knots[1]) | (or <- x > Boundary.knots[2])
   }
-  else outside <- rep(F, length = length(x))
+  else outside <- FALSE # rep(FALSE, length = length(x))
   if(!missing(df) && missing(knots)) {
     ## df = number(interior knots) + 1 + intercept
     nIknots <- df - 1 - intercept
@@ -91,7 +92,7 @@ ns <-
       knots <- quantile(x[!outside], knots)
     }
     else knots <- NULL
-  }
+  } else nIknots <- length(knots)
   Aknots <- sort(c(rep(Boundary.knots, 4), knots))
   if(any(outside)) {
     basis <- array(0, c(length(x), nIknots + 4))
@@ -113,8 +114,8 @@ ns <-
   else basis <- spline.des(Aknots, x, 4)$design
   const <- spline.des(Aknots, Boundary.knots, 4, c(2, 2))$design
   if(!intercept) {
-    const <- const[, -1]
-    basis <- basis[, -1]
+    const <- const[, -1 , drop = FALSE]
+    basis <- basis[, -1 , drop = FALSE]
   }
   qr.const <- qr(t(const))
   basis <- as.matrix((t(qr.qty(qr.const, t(basis))))[,  - (1:2)])
@@ -238,9 +239,9 @@ spline.value <-
   list(x = x.orig, y = z$y[rind])
 }
 
-spline.des <-
-  function(knots, x, ord = 4, derivs = integer(nx))
+spline.des <- function(knots, x, ord = 4, derivs = integer(nx))
 {
+  ## "Design matrix" for a collection of B-splines.  `The' basic function.
   knots <- sort(as.vector(knots))
   x <- as.vector(x)
   nk <- length(knots)

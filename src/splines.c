@@ -134,9 +134,11 @@ void spline_basis(double *knots, longint *ncoeff, longint *order,
 void lin_interp(double *x, double *y, double *x0, double *y0, longint *nvals)
 {
   longint n = *nvals;
+  double *firstx = x;
 
   while(n--) {
     while (*x < *x0) {x++; y++;}
+    if (x > firstx) {x--; y--;}
     if (*x > *x0) *y0++ = *y + (*(y+1) - *y)*(*x0 - *x)/(*(x+1) - *x);
     else *y0++ = *y;
     x0++;

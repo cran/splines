@@ -46,6 +46,8 @@ bs(x, df, knots, degree=3, intercept=FALSE, Boundary.knots)
   \code{predict.bs}.
 }
 \examples{
+library(splines)
+#data(??)  # What should be the data here?
 lm(y ~ bs(age, 4) + bs(income, 4)) # an additive model 
 fit <- lm(y ~ bs(age, knots=c(20,30), B=c(0,100)))
 predict(fit, new.age) #safe predictions because explicit knot sequence was supplied.
