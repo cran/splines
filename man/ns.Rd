@@ -23,32 +23,32 @@ ns(x, df, knots, intercept=F, Boundary.knots)
     extend beyond \code{Boundary.knots}}
 }
 \value{
-  a matrix of dimension \code{length(x) * df} where either \code{df} was
-  supplied or if \code{knots} were supplied,
-  \code{df = length(knots) + 1 + intercept}.
-  Attributes are returned that correspond to the arguments to \code{ns},
-  and explicitly give the \code{knots}, \code{Boundary.knots} etc for
-  use by \code{predict.ns()}.
+    a matrix of dimension \code{length(x) * df} where either \code{df} was
+    supplied or if \code{knots} were supplied,
+    \code{df = length(knots) + 1 + intercept}.
+    Attributes are returned that correspond to the arguments to \code{ns},
+    and explicitly give the \code{knots}, \code{Boundary.knots} etc for
+    use by \code{predict.ns()}.
+    
+    \code{ns()} is based on the function \code{spline.des()}.  It
+    generates a basis matrix for representing the family of
+    piecewise-cubic splines with the specified sequence of
+    interior knots, and the natural boundary conditions.  These enforce
+    the constraint that the function is linear beyond the boundary knots,
+    which can either be supplied, else default to the extremes of the
+    data.  A primary use is in modeling formula to directly specify a
+    natural spline term in a model.
 
-  \code{ns()} is based on the function \code{spline.des()} written by
-  Douglas Bates.  It generates a basis matrix for representing the
-  family of piecewise-cubic splines with the specified sequence of
-  interior knots, and the natural boundary conditions.  These enforce
-  the constraint that the function is linear beyond the boundary knots,
-  which can either be supplied, else default to the extremes of the
-  data.  A primary use is in modeling formula to directly specify a
-  natural spline term in a model.
-
-  Beware of making predictions with new \code{x} values when \code{df}
-  is used as an argument. Either use \code{safe.predict.gam()}, or else
-  specify \code{knots} and \code{Boundary.knots}.
+    Beware of making predictions with new \code{x} values when \code{df}
+    is used as an argument. Either use \code{safe.predict.gam()}, or else
+    specify \code{knots} and \code{Boundary.knots}.
 }
 \seealso{
   \code{bs}, \code{poly}, \code{lo}, \code{s}, \code{predict.ns}
 }
 \examples{
-lsfit(ns(x,5),y)
-lm(y ~ ns(age, 4) + ns(income, 4)) # an additive model 
-fit <- lm(y ~ ns(age, knots=c(20,30), B=c(10,60)))
-predict(fit, new.age) #safe predictions because explicit knot sequence was supplied.
+library(splines)
+data(women)
+ns(women$height, df = 5)
+summary(fm1 <- lm(weight ~ ns(height, df = 5), data = women))
 }

@@ -1,4 +1,4 @@
-### $Id: splines.R,v 1.3 1999/07/19 13:42:39 bates Exp $
+### $Id: splines.R,v 1.2 1999/11/09 20:54:22 bates Exp $
 
 bs <-
   function(x, df = NULL, knots = NULL, degree = 3, intercept = FALSE,
@@ -148,7 +148,7 @@ predict.ns <-
   if(missing(newx))
     return(object)
   a <- c(list(x = newx), attributes(object)[
-                c("degree", "knots", "Boundary.knots", "intercept")])
+                c("knots", "Boundary.knots", "intercept")])
   do.call("ns", a)
 }
 

@@ -37,6 +37,7 @@ library( splines )
 data( women )
 ispl <- interpSpline( women$height, women$weight )
 bspl <- backSpline( ispl )
-plot( bspl )    # plots over the range of the knots
+plot( bspl )                   # plots over the range of the knots
+points( women$weight, women$height )
 }
 \keyword{ models }

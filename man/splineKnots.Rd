@@ -1,4 +1,4 @@
-%% $Id: splineKnots.Rd,v 1.2 1998/06/30 16:55:26 bates Exp $
+%% $Id: splineKnots.Rd,v 1.2 1999/10/29 22:48:32 bates Exp $
 \name{splineKnots}
 \title{Knot Vector from a Spline}
 \usage{
@@ -19,7 +19,7 @@ splineKnots(object)
 \examples{
 library( splines )
 data( women )
-ispl <- interpSpline( weight ~ height, data = women )
+ispl <- interpSpline( weight ~ height, women )
 splineKnots( ispl )
 }
 \keyword{ models }

@@ -25,5 +25,7 @@ splineOrder(object)
 \examples{
 library( splines )
 data( women )
-splineOrder( interpSpline( weight ~ height, data = women ) )
+splineOrder( interpSpline( weight ~ height, women ) )
+}
 \keyword{ models }
+

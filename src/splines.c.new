@@ -26,34 +26,34 @@
 #define longint long int
 #endif /* R_S_H */
 
-static double *ldel, *rdel;
-static long orderm1;
-
 static void
-diff_table(double *ti, double x, longint ndiff)
+diff_table(double *kmid, double x, longint ndiff, double *ldiff,
+	   double *rdiff)
 {
-  register double *r = rdel, *l = ldel, *dpt = ti;
+    double *dpt = kmid;
   
-  while (ndiff--) {
-    *r++ = *dpt++ - x;
-    *l++ = x - *--ti;
-  }
+    while (ndiff--) {
+	*rdiff++ = *dpt++ - x;
+	*l++ = x - *--kmid;
+    }
 }
       
 static void
-basis_funcs(double *ti, double x, double *b)
+basis_funcs(double *ti, double x, double *b, longint ndiff)
 {
   longint j, r;
   double saved, term;
+  double *ldiff = Calloc(ndiff, double),
+    *ridff = Calloc(ndiff, double);
 
-  diff_table(ti, x, orderm1);
+  diff_table(ti, x, ndiff, ldiff, rdiff);
   b[0] = 1.;
-  for (j = 1; j <= orderm1; j++) {
+  for (j = 1; j <= ndiff; j++) {
     saved = 0.;
     for (r = 0; r < j; r++) {
-      term = b[r]/(rdel[r] + ldel[j - 1 - r]);
-      b[r] = saved + rdel[r] * term;
-      saved = ldel[j - 1 - r] * term;
+      term = b[r]/(rdiff[r] + ldiff[j - 1 - r]);
+      b[r] = saved + rdiff[r] * term;
+      saved = ldiff[j - 1 - r] * term;
     }
     b[j] = saved;
   }
@@ -92,10 +92,10 @@ spline_value(double *knots, double *coeff, longint *ncoeff,
   rdel = Calloc(orderm1, double);
   ldel = Calloc(orderm1, double);
 
-  knots += *order;		/* First *order knots must be <= all x's */
+  knots += *order;		/* First *order knots must be < all x's */
   while(n--) {
-    while(knots <= last && *knots <= *x) {knots++; coeff++;}
-    Memcpy(a, coeff, *order);
+    while(knots <= last && *(knots + 1) <= *x) {knots++; coeff++;}
+    memcpy((char *) a, (char *) coeff, (int) *order * sizeof(double));
     *y++ = evaluate(knots, *x++, a, (longint) *deriv);
   }
   Free(ldel); Free(rdel); Free(a);
@@ -110,11 +110,11 @@ void spline_basis(double *knots, longint *ncoeff, longint *order,
   longint n = *nx, i, j;
   double *dpt, *coeff, *last = knots + *ncoeff;
 
+  dpt = (knots += *order);	/* first order knots must be <= all xvals */
   orderm1 = *order - 1L;
-  rdel = Calloc(orderm1, double);
-  ldel = Calloc(orderm1, double);
-  coeff = Calloc(*order, double);
-  dpt = (knots += *order);	/* first *order knots must be <= all xvals */
+  rdel = (double *) S_alloc(orderm1, sizeof(double));
+  ldel = (double *) S_alloc(orderm1, sizeof(double));
+  coeff = (double *) S_alloc(*order, sizeof(double));
   for( ; n--; xvals++, derivs++) {
     while(dpt < last && *dpt <= *xvals) dpt++;
     if (*derivs) {		/* slow method for derivatives */
@@ -130,7 +130,6 @@ void spline_basis(double *knots, longint *ncoeff, longint *order,
     }
     *offsets++ = (long)(dpt - knots);
   }
-  Free(ldel); Free(rdel); Free(coeff);
 }
 
 void lin_interp(double *x, double *y, double *x0, double *y0, longint *nvals)

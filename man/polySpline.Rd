@@ -39,5 +39,6 @@ data( women )
 ispl <- polySpline( interpSpline( weight ~ height,  women ) )
 print( ispl )   # print the piecewise polynomial representation
 plot( ispl )    # plots over the range of the knots
+points( women$weight, women$height )
 }
 \keyword{ models }

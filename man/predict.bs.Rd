@@ -24,6 +24,10 @@ predict.ns(basis, newx)
   \code{bs}, \code{ns}, \code{poly}, \code{lo}, \code{s}
 }
 \examples{
-basis <- ns(x, knots=c(3,6), B=c(0,5)) #generate a basis
-basis.eval <- predict(basis, newx)
+library(splines)
+data(women)
+basis <- ns(women$height, df = 5)
+newX <- seq(58, 72, len = 51)
+# evaluate the basis at the new data
+predict(basis, newX)
 }

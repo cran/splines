@@ -1,4 +1,4 @@
-%% $Id: xyVector.Rd,v 1.2 1998/06/30 16:55:28 bates Exp $
+%% $Id: xyVector.Rd,v 1.2 1999/10/29 22:48:32 bates Exp $
 \name{xyVector}
 \title{Construct an xyVector object}
 \usage{
@@ -33,7 +33,8 @@ data( women )
 ispl <- interpSpline( weight ~ height, women )
 weights <- predict( ispl, seq( 55, 75, len = 51 ))
 class( weights )
-plot( weights )
+plot( weights, type = "l", xlab = "height", ylab = "weight" )
+points( women$height, women$weight )
 weights
 }
 \keyword{ models }%-- one or more ...

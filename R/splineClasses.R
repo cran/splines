@@ -1,4 +1,4 @@
-## $Id: splineClasses.R,v 1.1 1998/01/12 19:38:20 bates Exp $
+## $Id: splineClasses.R,v 1.2 1999/10/29 22:48:32 bates Exp $
 ##
 ## Classes and methods for determining and manipulating interpolation
 ## splines.
@@ -15,6 +15,7 @@
 ##   npolySpline - polynomial representation of a natural spline
 ##   pbSpline - periodic bSplines
 ##   ppolySpline - periodic polynomial splines
+##   backSpline - "splines" for inverse interpolation
 ##
 ##     Copyright (C) 1998 Douglas M. Bates and William N. Venables.
 ##
@@ -315,14 +316,11 @@ xyVector <-
 }
 
 asVector <-
-  ## coerce object to a vector.  In S4 this will not be needed
+  ## coerce object to a vector.
   function(object) UseMethod("asVector")
 
 asVector.xyVector <-
   function(object) object$y
-
-as.data.frame.data.frame <-
-  function(x, row.names = NULL, optional = F, ...) x
 
 as.data.frame.xyVector <-
   function(object) data.frame(x = object$x, y = object$y)
@@ -344,7 +342,7 @@ predict.polySpline <-
   if(missing(x)) {
     x <- seq(knots[1], knots[cdim[1]], length = nseg + 1)
   }
-  i <- codes(cut(x, knots))
+  i <- as.numeric(cut(x, knots))
   i[x == knots[1]] <- 1
   delx <- x - knots[i]
   deriv <- as.integer(deriv)[1]

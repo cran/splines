@@ -38,10 +38,10 @@ library( splines )
 xx <- seq( -pi, pi, len = 16 )[-1]
 yy <- sin( xx )
 frm <- data.frame( xx, yy )
-pispl <- periodicSpline( xx, yy, period = 2 * pi )
-pispl2 <- periodicSpline( yy ~ xx, frm, period = 2 * pi )
+print( pispl <- periodicSpline( xx, yy, period = 2 * pi ) )
+print( pispl2 <- periodicSpline( yy ~ xx, frm, period = 2 * pi ) )
 # pispl and pispl2 should be the same
 plot( predict( pispl, seq(-3*pi, 3*pi, len = 101) ), type = "l" )
-plot( pispl )
+plot( pispl )          # displays over one period
 }
 \keyword{ models }
