@@ -1,0 +1,11 @@
+1998-06-30  Douglas Bates  <bates@stat.wisc.edu>
+
+	* Changed the source location from src-c to src.
+
+	* Corrected some errors in the examples in the man pages.
+	
+
+1998-03-24  Douglas Bates  <bates@stat.wisc.edu>
+
+	*  (add): DESCRIPTION file added
+
